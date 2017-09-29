@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">AudioPlayerController</string>
+    <string name="loading">Loading...</string>
+</resources>
