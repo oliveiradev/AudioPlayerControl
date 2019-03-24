@@ -1,14 +1,11 @@
 package oliveiradev.com.github.audioplayercontrol.controller
 
-import android.content.Context
-
 /**
  * Created by felipe on 11/09/17.
  */
-interface AudioPlayerContract {
+interface AudioPlayerCommand {
 
-    fun play()
-    fun playAsService(context: Context)
+    fun play(path: String)
     fun pause()
     fun seekTo(position: Int)
 }

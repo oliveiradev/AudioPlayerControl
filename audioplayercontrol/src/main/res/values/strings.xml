@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">AudioPlayerControl</string>
-    <string name="apc_default_timer_value">0:00</string>
+    <string name="apc_default_timer_value">00:00</string>
 </resources>

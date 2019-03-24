@@ -1,73 +1,63 @@
 package oliveiradev.com.github.audioplayercontrol.view
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.ToggleButton
 import oliveiradev.com.github.audioplayercontrol.R
-import oliveiradev.com.github.audioplayercontrol.controller.AudioPlayerContract
+import oliveiradev.com.github.audioplayercontrol.controller.AudioPlayerController
 import oliveiradev.com.github.audioplayercontrol.extension.setOnUserInteractionListener
 import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * Created by felipe on 10/09/17.
  */
-class AudioPlayerView : FrameLayout, SeekBar.OnSeekBarChangeListener {
+class AudioPlayerView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr), SeekBar.OnSeekBarChangeListener {
 
+    private val playerController by lazy { AudioPlayerController() }
     private val duration: TextView
     private val timer: TextView
     private val progress: SeekBar
     private val playControl: ToggleButton
     private val durationFormatter = SimpleDateFormat("mm:ss")
-    private var audioPlayerContract: AudioPlayerContract? = null
+    private var audioPath = ""
 
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        val typedArray: TypedArray = context.obtainStyledAttributes(attrs,
-                R.styleable.AudioPlayerView, 0, 0)
+    init {
+        inflate(context, R.layout.view_default_audio_player, this)
 
-        val autoPlay = typedArray.getBoolean(R.styleable.AudioPlayerView_auto_play, false)
-        val customViewReference = typedArray.getResourceId(R.styleable.AudioPlayerView_custom_view, 0)
+        duration = findViewById(R.id.duration)
+        timer = findViewById(R.id.timer)
+        progress = findViewById(R.id.progress)
+        playControl = findViewById(R.id.play_control)
 
-        typedArray.recycle()
-
-        val layoutToInflate = if (customViewReference != 0) customViewReference
-        else R.layout.view_default_audio_player
-
-        LayoutInflater.from(context).inflate(layoutToInflate, this, true)
-
-        val container = getChildAt(0)
-        duration = container.findViewById(R.id.duration)
-        timer = container.findViewById(R.id.timer)
-        progress = container.findViewById(R.id.progress)
-        playControl = container.findViewById(R.id.play_control)
-
+        playerController.playerSetup(context)
         configPlayControl()
         configProgressSeekBar()
-        checkAutoPlay(autoPlay)
     }
 
     override fun onProgressChanged(seekBar: SeekBar?, position: Int, fromUser: Boolean) {
-        if (fromUser) audioPlayerContract?.seekTo(position)
-        updateTimer(position)
+//        if (fromUser) audioPlayerContract?.seekTo(position)
+//        updateTimer(position)
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        audioPlayerContract?.pause()
+//        audioPlayerContract?.pause()
     }
 
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        audioPlayerContract?.playAsService(context)
+//        audioPlayerContract?.setAudioPath(context)
     }
 
     private fun configPlayControl() {
         playControl.setOnUserInteractionListener { isChecked ->
-            if (isChecked) audioPlayerContract?.playAsService(context)
-            else audioPlayerContract?.pause()
+            if (isChecked) playerController.play(audioPath)
+            else playerController.pause()
         }
     }
 
@@ -75,12 +65,7 @@ class AudioPlayerView : FrameLayout, SeekBar.OnSeekBarChangeListener {
         progress.setOnSeekBarChangeListener(this)
     }
 
-    private fun checkAutoPlay(isAutoPlay: Boolean) {
-        if (isAutoPlay) {
-            audioPlayerContract?.playAsService(context)
-        }
-    }
-
+/*
     fun setPlayControlState(playerState: AudioPlayerState) {
         playControl.isChecked = playerState == AudioPlayerState.PLAY
     }
@@ -101,9 +86,13 @@ class AudioPlayerView : FrameLayout, SeekBar.OnSeekBarChangeListener {
         progress.progress = newSize
     }
 
-    fun setAudioPlayerContract(audioPlayerContract: AudioPlayerContract) {
-        this.audioPlayerContract = audioPlayerContract
+    fun setAudioPlayerContract(audioPlayerContract: AudioPlayerCommand) {
+//        this.audioPlayerContract = audioPlayerContract
+    }*/
+
+    fun setAudioPath(path: String) {
+        this.audioPath = path
     }
 
-    private fun getDurationFormatted(duration: Int) = durationFormatter.format(Date(duration.toLong()))
+//    private fun getDurationFormatted(duration: Int) = durationFormatter.format(Date(duration.toLong()))
 }
