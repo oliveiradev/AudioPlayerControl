@@ -11,7 +11,7 @@ import oliveiradev.com.github.audioplayercontrol.view.AudioPlayerView
 class MainActivity : AppCompatActivity(), OnPlayerLoadListener {
 
     private lateinit var audioPlayerController: AudioPlayerController
-    private val audioPlayerView by lazy { findViewById(R.id.player) as AudioPlayerView }
+    private val audioPlayerView by lazy { findViewById<AudioPlayerView>(R.id.player) }
     private val progressBar by lazy { ProgressDialog(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,8 +20,8 @@ class MainActivity : AppCompatActivity(), OnPlayerLoadListener {
         progressBar.setMessage(getString(R.string.loading))
 
         audioPlayerController = AudioPlayerController(
-                BuildConfig.SOME_AUDIO_URL,
-                audioPlayerView
+            BuildConfig.SOME_AUDIO_URL,
+            audioPlayerView
         )
 
         audioPlayerController.addPlayerLoadListener(this)

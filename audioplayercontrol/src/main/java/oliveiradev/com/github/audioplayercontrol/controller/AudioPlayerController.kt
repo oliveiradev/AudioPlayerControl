@@ -1,7 +1,12 @@
 package oliveiradev.com.github.audioplayercontrol.controller
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.media.MediaPlayer
 import android.os.CountDownTimer
+import android.os.IBinder
 import oliveiradev.com.github.audioplayercontrol.view.AudioPlayerState
 import oliveiradev.com.github.audioplayercontrol.view.AudioPlayerView
 
@@ -9,11 +14,12 @@ import oliveiradev.com.github.audioplayercontrol.view.AudioPlayerView
  * Created by felipe on 10/09/17.
  */
 class AudioPlayerController(
-        val audioUrl: String,
-        val audioPlayerView: AudioPlayerView
-    ) : AudioPlayerContract {
+    private val audioUrl: String,
+    private val audioPlayerView: AudioPlayerView
+) : AudioPlayerContract {
 
     private val mediaPlayer by lazy { MediaPlayer().apply { setDataSource(audioUrl) } }
+    private val serviceConnection: ServiceConnection
     private var currentPosition = 0
     private var onPlayerLoadListener: OnPlayerLoadListener? = null
     private var timer: CountDownTimer? = null
@@ -22,10 +28,22 @@ class AudioPlayerController(
     init {
         audioPlayerView.setAudioPlayerContract(this)
         configMediaPlayer()
+        serviceConnection = object : ServiceConnection {
+            override fun onServiceDisconnected(componentName: ComponentName?) {}
+
+            override fun onServiceConnected(componentName: ComponentName?, binder: IBinder?) {
+
+            }
+        }
     }
 
     override fun play() {
         start()
+    }
+
+    override fun playAsService(context: Context) {
+        val intent = Intent(context, AudioPlayerService::class.java)
+        context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     override fun pause() {
@@ -62,8 +80,10 @@ class AudioPlayerController(
     }
 
     private fun starProgressObserver(progress: Int) {
-        timer = object : CountDownTimer(progress.toLong(),
-                ONE_SECOND_IN_MILLIS.toLong()) {
+        timer = object : CountDownTimer(
+            progress.toLong(),
+            ONE_SECOND_IN_MILLIS.toLong()
+        ) {
             override fun onFinish() {
                 updateProgress(progress.div(ONE_SECOND_IN_MILLIS))
                 audioPlayerView.setPlayControlState(AudioPlayerState.PAUSE)
@@ -85,7 +105,7 @@ class AudioPlayerController(
     private fun start() {
         if (currentPosition > 0 || wasStarted) {
             restart()
-        } else if (currentPosition == 0 && wasStarted.not()){
+        } else if (currentPosition == 0 && wasStarted.not()) {
             mediaPlayer.prepareAsync()
             onPlayerLoadListener?.onAudioLoadingStart()
         }
@@ -110,7 +130,7 @@ class AudioPlayerController(
         timer?.cancel()
     }
 
-    fun getDuration(): Int = mediaPlayer.duration
+    private fun getDuration(): Int = mediaPlayer.duration
 
     companion object {
         private const val ONE_SECOND_IN_MILLIS = 1000

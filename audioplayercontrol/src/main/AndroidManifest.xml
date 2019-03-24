@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="oliveiradev.com.github.audioplayercontrol">
-    <application/>
+
+    <application>
+
+        <service
+            android:name=".controller.AudioPlayerService"
+            android:enabled="true" />
+    </application>
 </manifest>

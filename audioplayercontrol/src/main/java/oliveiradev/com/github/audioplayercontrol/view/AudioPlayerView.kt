@@ -14,7 +14,6 @@ import oliveiradev.com.github.audioplayercontrol.extension.setOnUserInteractionL
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 /**
  * Created by felipe on 10/09/17.
  */
@@ -62,12 +61,12 @@ class AudioPlayerView : FrameLayout, SeekBar.OnSeekBarChangeListener {
     }
 
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        audioPlayerContract?.play()
+        audioPlayerContract?.playAsService(context)
     }
 
     private fun configPlayControl() {
         playControl.setOnUserInteractionListener { isChecked ->
-            if (isChecked) audioPlayerContract?.play()
+            if (isChecked) audioPlayerContract?.playAsService(context)
             else audioPlayerContract?.pause()
         }
     }
@@ -78,7 +77,7 @@ class AudioPlayerView : FrameLayout, SeekBar.OnSeekBarChangeListener {
 
     private fun checkAutoPlay(isAutoPlay: Boolean) {
         if (isAutoPlay) {
-            audioPlayerContract?.play()
+            audioPlayerContract?.playAsService(context)
         }
     }
 
